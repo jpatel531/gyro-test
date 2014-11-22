@@ -1,40 +1,40 @@
 var app = angular.module('GyroTest', ['pusher-angular']).controller('AppCtrl', ['$scope', '$pusher', function($scope, $pusher){
 
-	var canvas=document.getElementById("canvas"),
-	    ctx = canvas.getContext("2d");
+	// var canvas=document.getElementById("canvas"),
+	//     ctx = canvas.getContext("2d");
 
-	canvas.width = canvas.height = 500;
+	// canvas.width = canvas.height = 500;
 
-	var targetX = 0,
-	    targetY = 0,
-	    x = 10,
-	    y = 10,
-	    velX = 0,
-	    velY = 0,
-	    speed = 5;
+	// var targetX = 0,
+	//     targetY = 0,
+	//     x = 10,
+	//     y = 10,
+	//     velX = 0,
+	//     velY = 0,
+	//     speed = 5;
 
-	function update(){
-	    var tx = targetX - x,
-	        ty = targetY - y,
-	        dist = Math.sqrt(tx*tx+ty*ty),
-	        rad = Math.atan2(ty,tx),
-	        angle = rad/Math.PI * 180;
+	// function update(){
+	//     var tx = targetX - x,
+	//         ty = targetY - y,
+	//         dist = Math.sqrt(tx*tx+ty*ty),
+	//         rad = Math.atan2(ty,tx),
+	//         angle = rad/Math.PI * 180;
 
-	        velX = (tx/dist)*speed,
-	        velY = (ty/dist)*speed;
+	//         velX = (tx/dist)*speed,
+	//         velY = (ty/dist)*speed;
 	    
-	        x += velX
-	        y += velY
+	//         x += velX
+	//         y += velY
 	            
-	        ctx.clearRect(0,0,500,500);
-	        ctx.beginPath();
-	        ctx.arc(x,y,5,0,Math.PI*2);
-	        ctx.fill();
+	//         ctx.clearRect(0,0,500,500);
+	//         ctx.beginPath();
+	//         ctx.arc(x,y,5,0,Math.PI*2);
+	//         ctx.fill();
 	    
-	    setTimeout(update,10);
-	}
+	//     setTimeout(update,10);
+	// }
 
-	update();
+	// update();
 
 	// canvas.addEventListener("mousemove", function(e){
 	//     targetX = e.pageX;
@@ -46,9 +46,18 @@ var app = angular.module('GyroTest', ['pusher-angular']).controller('AppCtrl', [
 
 	var tiltChannel = pusher.subscribe('tilt-channel');
 
+
+	elem = document.getElementById('test');
+
 	tiltChannel.bind('new-tilt', function(data){
-		targetY = (data.beta * 5 );
-		targetX = (data.gamma * 5);
+		// targetY = (data.beta * 5 );
+		// targetX = (data.gamma * 5);
+
+	    var width = window.outerWidth,
+        rot = data.gamma / 360,
+        left = ( width / 2 ) * rot;
+    	elem.style.left = left + 'px';
+
 		$scope.tilt = data;
 	});
 
