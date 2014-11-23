@@ -53,10 +53,18 @@ var app = angular.module('GyroTest', ['pusher-angular']).controller('AppCtrl', [
 		// targetY = (data.beta * 5 );
 		// targetX = (data.gamma * 5);
 
+		// console.log(elem.style.marginTop);
+
 	    var width = window.outerWidth,
-        rot = data.gamma / 360,
-        left = ( width / 2 ) * rot;
+        x_rot = data.gamma / 360,
+        left = ( width / 2 ) * x_rot;
     	elem.style.left = left + 'px';
+
+    	var height = window.outerHeight
+    	y_rot = data.beta / 360
+    	bottom = (height / 2 ) * y_rot;
+    	console.log(bottom);
+    	elem.style.bottom = bottom + 'px';
 
 		$scope.tilt = data;
 	});
