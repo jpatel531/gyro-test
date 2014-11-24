@@ -30,61 +30,32 @@ var app = angular.module('GyroTest', ['pusher-angular']).controller('AppCtrl', [
 		return setInterval(draw, 10);
 	}
 
-	function doKeyDown(evt){
-		switch (evt.keyCode) {
-			case 38:  /* Up arrow was pressed */
-			if (y - dy > 0){
-				y -= dy;
-				clear();
-				checkcollision();
-				if (collision == 1){
-					y += dy;
-					collision = 0;
-				}
-			}
-
-			break;
-			case 40:  /* Down arrow was pressed */
-			if (y + dy < HEIGHT ){
-				y += dy;
-				clear();
-				checkcollision();
-				if (collision == 1){
-					y -= dy;
-					collision = 0;
-				}
-			}
-
-			break;
-			case 37:  /* Left arrow was pressed */
-			if (x - dx > 0){
-				x -= dx;
-				clear();
-				checkcollision();
-				if (collision == 1){
-					x += dx;
-					collision = 0;
-				}
-			}
-			break;
-			case 39:  /* Right arrow was pressed */
-			if ((x + dx < WIDTH)){
-				x += dx;
-				clear();
-				checkcollision();
-				if (collision == 1){
-					x -= dx;
-					collision = 0;
-				}
-			}
-			break;
-		}
-	}
 
 
 	function moveSquare(tilt){
-		if (tilt.beta < -30){
-			console.log('up')
+
+		var sortable = [];
+
+		for (var angle in tilt) {
+			sortable.push([angle, tilt[angle]])
+		}
+
+		var sorted = sortable.sort(function(a, b){ return Math.abs(b[1]) - Math.abs(a[1])})
+		console.log(sorted);
+		// console.log(sorted);
+		var choice = sorted[0];
+		console.log(choice);
+		var movement;
+
+		if (choice[0] === 'beta' && choice[1] < -10) movement = 'up';
+		if (choice[0] === 'beta' && choice[1] > 10) movement = 'down';
+		if (choice[0] === 'gamma' && choice[1] > 10) movement = 'right';
+		if (choice[0] === 'gamma' && choice[1] < -10 ) movement = 'left';
+
+		console.log(movement);
+
+		switch (movement) {
+			case 'up':  /* Up arrow was pressed */
 			if (y - dy > 0){
 				y -= dy;
 				clear();
@@ -94,8 +65,9 @@ var app = angular.module('GyroTest', ['pusher-angular']).controller('AppCtrl', [
 					collision = 0;
 				}
 			}
-		} else if (tilt.beta > 30) {
-			console.log('down');
+
+			break;
+			case 'down':  /* Down arrow was pressed */
 			if (y + dy < HEIGHT ){
 				y += dy;
 				clear();
@@ -105,8 +77,9 @@ var app = angular.module('GyroTest', ['pusher-angular']).controller('AppCtrl', [
 					collision = 0;
 				}
 			}
-		} else if (tilt.gamma < 30){
-			console.log('left');
+
+			break;
+			case 'left':  /* Left arrow was pressed */
 			if (x - dx > 0){
 				x -= dx;
 				clear();
@@ -116,8 +89,8 @@ var app = angular.module('GyroTest', ['pusher-angular']).controller('AppCtrl', [
 					collision = 0;
 				}
 			}
-		} else if (tilt.gamma > 30){
-			console.log('right');
+			break;
+			case 'right':  /* Right arrow was pressed */
 			if ((x + dx < WIDTH)){
 				x += dx;
 				clear();
@@ -127,39 +100,8 @@ var app = angular.module('GyroTest', ['pusher-angular']).controller('AppCtrl', [
 					collision = 0;
 				}
 			}
+			break;
 		}
-
-
-
-			// case tilt.beta > 10:  /* Down arrow was pressed */
-			// console.log('down');
-			
-
-			// break;
-			// case tilt.gamma < -10:  /* Left arrow was pressed */
-			// console.log('left')
-			// if (x - dx > 0){
-			// 	x -= dx;
-			// 	clear();
-			// 	checkcollision();
-			// 	if (collision == 1){
-			// 		x += dx;
-			// 		collision = 0;
-			// 	}
-			// }
-			// break;
-			// case tilt.gamma > 10:  /* Right arrow was pressed */
-			// console.log('right');
-			// if ((x + dx < WIDTH)){
-			// 	x += dx;
-			// 	clear();
-			// 	checkcollision();
-			// 	if (collision == 1){
-			// 		x -= dx;
-			// 		collision = 0;
-			// 	}
-			// }
-			// break;
 	}
 
 	function checkcollision() {
@@ -179,11 +121,7 @@ var app = angular.module('GyroTest', ['pusher-angular']).controller('AppCtrl', [
 	}
 
 
-
-
-
 	init();
-	window.addEventListener('keydown',doKeyDown,true);
 
 
 	var client = new Pusher('77f6df16945f47c63a1f');
@@ -222,7 +160,8 @@ app.controller('TiltCtrl', ['$scope', '$pusher', '$http', function($scope, $push
 	// gyro.frequency = 1000;
 
 	gyro.startTracking(function(o) {
-		$scope.$apply(function(){$scope.gyro = {alpha: o.alpha, beta: o.beta, gamma: o.gamma}})
+		var o = {beta: o.beta, gamma: o.gamma}
+		$scope.$apply(function(){$scope.gyro = o})
 		$http.post('/control', o).success(function(data){console.log('Posted')});
 	});
 
